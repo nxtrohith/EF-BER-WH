@@ -364,7 +364,7 @@ class EF_BER_Estimator:
             predicted_labels_for_mixed = self.knn_model.predict(mixed_points_for_knn_prediction)
             
             for actual, predicted in zip(all_mixed_points_actual_labels, predicted_labels_for_mixed):
-                if actual_label != predicted_label:
+                if actual != predicted:
                     self.noise_count += 1
         
         # Total count for original BER: sum of points in pure clusters (used for X_train_final_knn) 
@@ -460,7 +460,7 @@ if __name__ == "__main__":
     data_source_name = ""
 
     # Try to load data from the primary CSV file
-    primary_csv_path = 'water_potability.csv'
+    primary_csv_path = 'ID_6.csv'
     try:
         print(f"\nAttempting to load data from '{primary_csv_path}'...")
         df = pd.read_csv(primary_csv_path)
