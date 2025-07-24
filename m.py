@@ -8,7 +8,6 @@ import time
 import traceback # For more detailed error reporting in main
 
 
-# --- Global Helper Functions ---
 
 def assign_label(hardness):
     """
