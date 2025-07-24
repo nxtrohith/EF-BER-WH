@@ -6,7 +6,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import KFold
 import time
 import traceback # For more detailed error reporting in main
-
+// --- Helper Function to Assign Water Hardness Labels ---
 
 
 def assign_label(hardness):
