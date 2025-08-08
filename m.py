@@ -48,7 +48,7 @@ class EF_BER_Estimator:
     """
     Estimator for Bit Error Rate (BER) using a combination of K-means bisection
     for clustering and a KNN classifier trained on 'pure' clusters.
-    Includes 2-fold cross-validation for BER estimation.
+    Includes 10-fold cross-validation for BER estimation.
     """
     # Constants for the internal 2-means algorithm in kmeans_bisection
     _KMEANS_MAX_ITER = 100
@@ -203,7 +203,7 @@ class EF_BER_Estimator:
     def train(self, data):
         """
         Trains the EF-BER estimator. This involves:
-        1. Performing 2-fold cross-validation to get a robust BER estimate.
+        1. Performing 10-fold cross-validation to get a robust BER estimate.
         2. Training a final model on the entire dataset for predictions and visualization.
         """
         overall_start_time = time.time()
@@ -211,13 +211,13 @@ class EF_BER_Estimator:
         if not isinstance(data, np.ndarray):
             data = np.array(data, dtype=float) # Ensure data is a NumPy array
 
-        # --- Part 1: 2-Fold Cross-Validation for BER Estimation ---
-        print("\n--- Starting 2-Fold Cross-Validation for BER Estimation ---")
-        kf = KFold(n_splits=2, shuffle=True, random_state=42) # random_state for reproducibility
+        # --- Part 1: 10-Fold Cross-Validation for BER Estimation ---
+        print("\n--- Starting 10-Fold Cross-Validation for BER Estimation ---")
+        kf = KFold(n_splits=10, shuffle=True, random_state=42) # random_state for reproducibility
         fold_bers = [] # To store BER from each fold's test set
         
         for fold_num, (train_indices, test_indices) in enumerate(kf.split(data)):
-            current_fold_label = f"Fold {fold_num + 1}/2"
+            current_fold_label = f"Fold {fold_num + 1}/10"
             print(f"\nProcessing {current_fold_label}...")
             
             data_train_fold, data_test_fold = data[train_indices], data[test_indices]
@@ -304,7 +304,7 @@ class EF_BER_Estimator:
                 pure_clusters_full_data.append(cluster_item)
             else:
                 mixed_clusters_full_data.append(cluster_item)
-        
+
         # 2b. Prepare training data for the final KNN model from pure clusters of the full dataset
         X_train_final_knn = []
         y_train_final_knn = []
@@ -383,7 +383,7 @@ class EF_BER_Estimator:
         print(f"\n--- BER Summary ---")
         print(f"BER (Original Method, Full Dataset): {self.ber:.4f}")
         print(f"  (Noise: {self.noise_count} from mixed clusters / Total relevant points: {self.total_count})")
-        print(f"Estimated BER (2-Fold Cross-Validation): {self.cv_ber_estimate:.4f}")
+        print(f"Estimated BER (10-Fold Cross-Validation): {self.cv_ber_estimate:.4f}")
 
     def predict(self, X_new_samples):
         """
@@ -459,7 +459,7 @@ if __name__ == "__main__":
     data_source_name = ""
 
     # Try to load data from the primary CSV file
-    primary_csv_path = '76k_transformed.csv'
+    primary_csv_path = 'ID_6.csv'
     try:
         print(f"\nAttempting to load data from '{primary_csv_path}'...")
         df = pd.read_csv(primary_csv_path)
@@ -489,11 +489,11 @@ if __name__ == "__main__":
         df = None
 
     # If loading failed or resulted in no data, try a fallback or generate random data
-    if hardness_data is None or len(hardness_data) < 10: # Need at least a few points for CV
+    if hardness_data is None or len(hardness_data) < 10: # Need at least 10 points for 10-fold CV
         if hardness_data is None:
              print("Proceeding to generate random data for demonstration purposes.")
         elif len(hardness_data) < 10:
-             print(f"Loaded data from {data_source_name} but it has very few samples ({len(hardness_data)}). Generating random data instead for a better demo.")
+             print(f"Loaded data from {data_source_name} but it has only {len(hardness_data)} samples; need at least 10 for 10-fold CV. Generating random data instead for a better demo.")
 
         print("\nGenerating random hardness data for demonstration...")
         np.random.seed(42) # For reproducible random data
